@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Comment Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+
+        .panel {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #0f3460;
+        }
+
+        .panel-title {
+            color: #00d4ff;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: #0d1b2a;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            color: #e0e0e0;
+            padding: 14px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #00d4ff;
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            background: #00b8d9;
+        }
+
+        .btn-secondary {
+            background: #0f3460;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #1a4a7a;
+        }
+
+        .btn-danger {
+            background: #e94560;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #c73750;
+        }
+
+        .output-box {
+            position: relative;
+            background: #0d1b2a;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 80px;
+            line-height: 1.6;
+            color: #a8d8a8;
+        }
+
+        .output-placeholder {
+            color: #555;
+            font-style: italic;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #0f3460;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #1a4a7a;
+        }
+
+        .copy-btn.copied {
+            background: #2ecc71;
+            color: #fff;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2ecc71;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+            z-index: 999;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .history-item {
+            background: #0d1b2a;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-date {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .history-actions .btn {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        .history-content {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #a8d8a8;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #555;
+            padding: 30px;
+            font-style: italic;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            color: #888;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SQL Comment Generator</h1>
+        <p class="subtitle">Pega tus enunciados y obten cada uno envuelto en comentarios SQL multilínea</p>
+
+        <div class="panel">
+            <div class="panel-title">Entrada</div>
+            <textarea id="inputText" placeholder="Pega aquí tus enunciados, uno por línea...&#10;&#10;Ejemplo:&#10;Calcula la suma del presupuesto de todos los departamentos.&#10;Calcula la media del presupuesto de todos los departamentos."></textarea>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="generate()">Generar Comentarios</button>
+                <button class="btn btn-secondary" onclick="clearInput()">Limpiar</button>
+            </div>
+        </div>
+
+        <div class="panel" id="outputPanel" style="display: none;">
+            <div class="panel-title">Resultado</div>
+            <div class="output-box" id="outputBox">
+                <button class="copy-btn" onclick="copyOutput()">Copiar</button>
+                <span id="outputContent"></span>
+            </div>
+            <div class="stats" id="stats"></div>
+            <div class="btn-row">
+                <button class="btn btn-secondary" onclick="saveToHistory()">Guardar en Historial</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>Historial</span>
+                <button class="btn btn-danger" onclick="clearHistory()" style="padding: 4px 12px; font-size: 12px;">Borrar Todo</button>
+            </div>
+            <div id="historyList">
+                <div class="empty-history">No hay elementos en el historial.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentOutput = '';
+        let history = JSON.parse(localStorage.getItem('sqlCommentHistory') || '[]');
+
+        renderHistory();
+
+        function generate() {
+            const input = document.getElementById('inputText').value.trim();
+            if (!input) {
+                showToast('Introduce al menos una línea de texto.', '#e94560');
+                return;
+            }
+
+            const lines = input.split('\n').filter(function(line) {
+                return line.trim() !== '';
+            });
+
+            const commented = lines.map(function(line) {
+                return '/*\n' + line.trim() + '\n*/';
+            });
+
+            currentOutput = commented.join('\n\n');
+
+            document.getElementById('outputContent').textContent = currentOutput;
+            document.getElementById('outputPanel').style.display = 'block';
+            document.getElementById('stats').textContent = lines.length + ' enunciado' + (lines.length !== 1 ? 's' : '') + ' procesado' + (lines.length !== 1 ? 's' : '');
+
+            showToast('Comentarios generados correctamente.');
+        }
+
+        function copyOutput() {
+            if (!currentOutput) return;
+
+            navigator.clipboard.writeText(currentOutput).then(function() {
+                var btn = document.querySelector('.copy-btn');
+                btn.textContent = 'Copiado!';
+                btn.classList.add('copied');
+                setTimeout(function() {
+                    btn.textContent = 'Copiar';
+                    btn.classList.remove('copied');
+                }, 1500);
+                showToast('Copiado al portapapeles.');
+            }).catch(function() {
+                fallbackCopy(currentOutput);
+            });
+        }
+
+        function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('Copiado al portapapeles.');
+        }
+
+        function saveToHistory() {
+            if (!currentOutput) return;
+
+            var entry = {
+                date: new Date().toLocaleString('es-ES'),
+                timestamp: Date.now(),
+                content: currentOutput
+            };
+
+            history.unshift(entry);
+            localStorage.setItem('sqlCommentHistory', JSON.stringify(history));
+            renderHistory();
+            showToast('Guardado en el historial.');
+        }
+
+        function renderHistory() {
+            var container = document.getElementById('historyList');
+
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-history">No hay elementos en el historial.</div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < history.length; i++) {
+                html += '<div class="history-item">' +
+                    '<div class="history-meta">' +
+                        '<span class="history-date">' + history[i].date + '</span>' +
+                        '<div class="history-actions">' +
+                            '<button class="btn btn-secondary" onclick="copyHistoryItem(' + i + ')">Copiar</button>' +
+                            '<button class="btn btn-danger" onclick="deleteHistoryItem(' + i + ')">Eliminar</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="history-content">' + escapeHtml(history[i].content) + '</div>' +
+                '</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        function copyHistoryItem(index) {
+            var text = history[index].content;
+            navigator.clipboard.writeText(text).then(function() {
+                showToast('Copiado al portapapeles.');
+            }).catch(function() {
+                fallbackCopy(text);
+            });
+        }
+
+        function deleteHistoryItem(index) {
+            history.splice(index, 1);
+            localStorage.setItem('sqlCommentHistory', JSON.stringify(history));
+            renderHistory();
+            showToast('Elemento eliminado.', '#e94560');
+        }
+
+        function clearHistory() {
+            if (history.length === 0) return;
+            history = [];
+            localStorage.setItem('sqlCommentHistory', JSON.stringify(history));
+            renderHistory();
+            showToast('Historial borrado.', '#e94560');
+        }
+
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputPanel').style.display = 'none';
+            currentOutput = '';
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showToast(message, color) {
+            var toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.background = color || '#2ecc71';
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
