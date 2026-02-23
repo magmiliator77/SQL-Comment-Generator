@@ -236,12 +236,170 @@
             color: #888;
             font-size: 13px;
         }
+
+        /* Info / description section */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .example-block { flex-direction: column; }
+            .example-arrow { transform: rotate(90deg); text-align: center; }
+        }
+
+        .info-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #0d1b2a;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .info-icon {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: #00d4ff;
+            color: #1a1a2e;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .info-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .info-text strong {
+            color: #00d4ff;
+        }
+
+        .info-text span {
+            color: #b0b8c8;
+        }
+
+        .info-text code {
+            background: #1a1a2e;
+            color: #f9ca24;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+        }
+
+        .info-text em {
+            color: #e0e0e0;
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        .example-block {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            background: #0d1b2a;
+            border: 1px solid #0f3460;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .example-label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .example-col {
+            flex: 1;
+        }
+
+        .example-col pre {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            color: #a8d8a8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.6;
+        }
+
+        .example-arrow {
+            color: #00d4ff;
+            font-size: 22px;
+            padding-top: 22px;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>SQL Comment Generator</h1>
-        <p class="subtitle">Pega tus enunciados y obten cada uno envuelto en comentarios SQL multilínea</p>
+        <p class="subtitle">Convierte enunciados de ejercicios en comentarios SQL multilínea listos para usar</p>
+
+        <div class="panel">
+            <div class="panel-title">¿Qué hace esta herramienta?</div>
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">1</div>
+                    <div class="info-text">
+                        <strong>Pega tus enunciados</strong>
+                        <span>Escribe o pega todos los enunciados de tu ejercicio SQL en el área de texto, uno por línea.</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">2</div>
+                    <div class="info-text">
+                        <strong>Genera los comentarios</strong>
+                        <span>El algoritmo envuelve cada línea automáticamente entre <code>/*</code> y <code>*/</code>, separados por una línea en blanco para mayor legibilidad.</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">3</div>
+                    <div class="info-text">
+                        <strong>Copia y pega en tu editor</strong>
+                        <span>Usa el botón <em>Copiar</em> para llevar el resultado directo a tu editor SQL. Cada enunciado queda listo para escribir la consulta justo debajo.</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon">4</div>
+                    <div class="info-text">
+                        <strong>Guarda en el historial</strong>
+                        <span>Pulsa <em>Guardar en Historial</em> para conservar el resultado. El historial persiste aunque cierres el navegador (usa localStorage).</span>
+                    </div>
+                </div>
+            </div>
+            <div class="example-block">
+                <div class="example-label">Ejemplo de entrada</div>
+                <div class="example-col">
+                    <pre>Calcula la suma del presupuesto de todos los departamentos.
+Calcula la media del presupuesto de todos los departamentos.</pre>
+                </div>
+                <div class="example-arrow">→</div>
+                <div class="example-col">
+                    <pre>/*
+Calcula la suma del presupuesto de todos los departamentos.
+*/
+
+/*
+Calcula la media del presupuesto de todos los departamentos.
+*/</pre>
+                </div>
+            </div>
+        </div>
 
         <div class="panel">
             <div class="panel-title">Entrada</div>
